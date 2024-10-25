@@ -5,4 +5,6 @@ set(CMAKE_CXX_STANDARD 26)
 
 add_executable(interprit main.cpp
         Bor.cpp
-        Bor.h)
+        Bor.h
+        lexemes
+)
