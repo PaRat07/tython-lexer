@@ -1,3 +1,8 @@
 #pragma once
 
-class Lex;
+#include <iostream>
+
+class Lex {
+public:
+    virtual void Print() = 0;
+};
