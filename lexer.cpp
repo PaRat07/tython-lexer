@@ -6,11 +6,6 @@ void Lexer::Scan(const std::string &file_name) {
     std::string buffer;
     while (in.get(tec_value)) {
         buffer.clear();
-        if (is_letter(tec_value)) {
-            buffer.push_back(tec_value);
-            ident(buffer);
-            continue;
-        }
         if (is_oper(tec_value)) {
             buffer.push_back(tec_value);
             comment_or_operator(buffer);
@@ -25,19 +20,25 @@ void Lexer::Scan(const std::string &file_name) {
             number_literal(buffer);
             continue;
         }
+        if (tec_value != ' ' && tec_value != '\n') {
+            buffer.push_back(tec_value);
+            ident(buffer);
+        }
     }
 }
 
 void Lexer::ident(std::string &a) {
     char tec_value;
-    bool is_other = false;
+    bool is_other = !is_letter(a.front());
     if (is_letter(in.peek())) {
-        while (in.peek() != ' ' && in.peek() != '\n' && in.peek() != EOF && in.peek() != ';') {
+        while (in.peek() != ' ' && in.peek() != '\n' && in.peek() != EOF) {
             in.get(tec_value);
-            if (!is_letter(tec_value) && !is_num(tec_value)) {
+            if (!is_letter(tec_value) && !is_num(tec_value) && tec_value != ';') {
                 is_other = true;
             }
-            a.push_back(tec_value);
+            if (tec_value != ';') {
+                a.push_back(tec_value);
+            }
         }
     }
     if (is_other) {
@@ -89,11 +90,19 @@ void Lexer::string_literal(std::string &a) {
 
 void Lexer::number_literal(std::string &a) {
     char tec_value;
+    bool is_float = false;
     while (in.peek() != ' ' && in.peek() != '\n' && in.peek() != EOF) {
         in.get(tec_value);
         a.push_back(tec_value);
+        if (tec_value == '.') {
+            is_float = true;
+        }
     }
-    data_.push_back(new Int_num(a));
+    if (is_float) {
+        data_.push_back(new Float_num(a));
+    } else {
+        data_.push_back(new Int_num(a));
+    }
 }
 
 void Lexer::comment(std::string &a) {
